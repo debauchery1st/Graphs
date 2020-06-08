@@ -64,16 +64,19 @@ class Graph:
         """
         stack = [starting_vertex]  # create new stack containing the head of g
         visited = OrderedDict()  # boolean matrix
-        # result = [] # ordered list of visited vetices.
+        # loop...
         while len(stack) > 0:  # for every vert,
             vertex_id = stack.pop()  # obtained from g,
             if not visited.get(vertex_id, False):  # if not already visited,
                 visited[vertex_id] = True  # mark as visited
-                # result.append(vertex_id) #
-                adjacent = self.get_neighbors(vertex_id)
-                for neighbor in adjacent:
-                    stack.append(neighbor)
-        print("\n".join(list(map(str, visited))))  # cast expected by test
+                adjacent = self.get_neighbors(
+                    vertex_id)  # find adjacent vertices
+                for neighbor in adjacent:  # for every adjacent vertice
+                    stack.append(neighbor)  # push onto stack
+        # finally,
+        #   cast the vistied vertices into
+        #    the format expected by tests.
+        print("\n".join(list(map(str, visited))))
 
     def dft_recursive(self, starting_vertex):
         """

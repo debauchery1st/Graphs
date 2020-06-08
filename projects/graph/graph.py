@@ -55,8 +55,22 @@ class Graph:
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        # q = Queue()
-        pass  # TODO
+        q = Queue()
+        q.enqueue(starting_vertex)
+        visited = OrderedDict()  # boolean matrix
+        # loop...
+        while q.size() > 0:  # for every vert,
+            vertex_id = q.dequeue()  # obtained from g,
+            if not visited.get(vertex_id, False):  # if not already visited,
+                visited[vertex_id] = True  # mark as visited
+                adjacent = self.get_neighbors(
+                    vertex_id)  # find adjacent vertices
+                for neighbor in adjacent:  # for every adjacent vertice
+                    q.enqueue(neighbor)  # push onto stack
+        # finally,
+        #   cast the vistied vertices into
+        #    the format expected by tests.
+        print("\n".join(list(map(str, visited))))
 
     def dft(self, starting_vertex):
         """

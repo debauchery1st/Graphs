@@ -55,6 +55,7 @@ class Graph:
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
+        # q = Queue()
         pass  # TODO
 
     def dft(self, starting_vertex):
@@ -62,17 +63,19 @@ class Graph:
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        stack = [starting_vertex]  # create new stack containing the head of g
+        # stack = [starting_vertex]  # create new stack containing the head of g
+        stack = Stack()
+        stack.push(starting_vertex)
         visited = OrderedDict()  # boolean matrix
         # loop...
-        while len(stack) > 0:  # for every vert,
+        while stack.size() > 0:  # for every vert,
             vertex_id = stack.pop()  # obtained from g,
             if not visited.get(vertex_id, False):  # if not already visited,
                 visited[vertex_id] = True  # mark as visited
                 adjacent = self.get_neighbors(
                     vertex_id)  # find adjacent vertices
                 for neighbor in adjacent:  # for every adjacent vertice
-                    stack.append(neighbor)  # push onto stack
+                    stack.push(neighbor)  # push onto stack
         # finally,
         #   cast the vistied vertices into
         #    the format expected by tests.

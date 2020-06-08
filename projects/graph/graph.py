@@ -2,10 +2,13 @@
 Simple graph implementation
 """
 from util import Stack, Queue  # These may come in handy
+from collections import OrderedDict
+
 
 class Graph:
 
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
+
     def __init__(self):
         self.vertices = {}
 
@@ -13,19 +16,39 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        self.vertices[vertex_id] = set()  # set of edges from this vert
+
+    def add_vertices(self, vertices):
+        for vertex_id in vertices:
+            self.add_vertex(vertex_id)
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        have_1 = v1 in self.vertices
+        have_2 = v2 in self.vertices
+        if (have_1 and have_2):
+            self.vertices[v1].add(v2)
+            return
+        no_2 = f"No '{str(v2)}' vertex in graph" if (
+            have_1 and not have_2) else False
+        no_1 = f"No '{str(v1)}' vertex in graph" if (
+            have_2 and not have_1) else False
+        no = f"No '{str(v1)}' or '{str(v2)}' vertex in graph" if (
+            not have_1 and not have_2) else False
+        err = no or no_1 or no_2
+        raise KeyError(err)
+
+    def add_edges(self, v1, edges):
+        for v2 in edges:
+            self.add_edge(v1, v2)
 
     def get_neighbors(self, vertex_id):
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
         """
@@ -39,7 +62,18 @@ class Graph:
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        stack = [starting_vertex]  # create new stack containing the head of g
+        visited = OrderedDict()  # boolean matrix
+        # result = [] # ordered list of visited vetices.
+        while len(stack) > 0:  # for every vert,
+            vertex_id = stack.pop()  # obtained from g,
+            if not visited.get(vertex_id, False):  # if not already visited,
+                visited[vertex_id] = True  # mark as visited
+                # result.append(vertex_id) #
+                adjacent = self.get_neighbors(vertex_id)
+                for neighbor in adjacent:
+                    stack.append(neighbor)
+        print("\n".join(list(map(str, visited))))  # cast expected by test
 
     def dft_recursive(self, starting_vertex):
         """
@@ -75,6 +109,7 @@ class Graph:
         This should be done using recursion.
         """
         pass  # TODO
+
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph

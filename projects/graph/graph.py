@@ -95,14 +95,22 @@ class Graph:
         #    the format expected by tests.
         print("\n".join(list(map(str, visited))))
 
-    def dft_recursive(self, starting_vertex):
+    def dft_recursive(self, starting_vertex, visited=OrderedDict()):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
 
         This should be done using recursion.
         """
-        pass  # TODO
+        nbrs = self.get_neighbors(starting_vertex)
+        if len(visited) == 0:
+            visited[starting_vertex] = True
+            print(starting_vertex)
+        for nbr in nbrs:
+            if not visited.get(nbr, False):
+                visited[nbr] = True
+                print(nbr)
+                self.dft_recursive(nbr, visited)
 
     def bfs(self, starting_vertex, destination_vertex):
         """

@@ -72,7 +72,7 @@ class Graph:
         #    the format expected by tests.
         print("\n".join(list(map(str, visited))))
 
-    def dft(self, starting_vertex):
+    def dft(self, starting_vertex, rType=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
@@ -93,24 +93,36 @@ class Graph:
         # finally,
         #   cast the vistied vertices into
         #    the format expected by tests.
-        print("\n".join(list(map(str, visited))))
+        if not rType:
+            print("\n".join(list(map(str, visited))))
+            return
+        return rType(map(str, visited))
 
-    def dft_recursive(self, starting_vertex, visited=OrderedDict()):
+    def dft_recursive(self, starting_vertex, visited=None, rList=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
 
         This should be done using recursion.
         """
+        if visited is None:
+            visited = OrderedDict()
         nbrs = self.get_neighbors(starting_vertex)
         if len(visited) == 0:
             visited[starting_vertex] = True
-            print(starting_vertex)
+            if rList is None:
+                print(starting_vertex)
+            else:
+                rList.append(starting_vertex)
         for nbr in nbrs:
             if not visited.get(nbr, False):
                 visited[nbr] = True
-                print(nbr)
-                self.dft_recursive(nbr, visited)
+                if rList is None:
+                    print(nbr)
+                else:
+                    rList.append(nbr)
+                self.dft_recursive(nbr, visited, rList)
+        return rList
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -118,7 +130,19 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue([starting_vertex])
+        # loop...
+        while q.size() > 0:
+            cur = q.dequeue()  # the current path
+            tail = cur[-1]  # visiting
+            if tail == destination_vertex:
+                return cur  # found destination, return path
+            nbrs = self.get_neighbors(tail)  # get adjacent vertices
+            for vertex_id in nbrs:
+                clone = list(cur)
+                clone.append(vertex_id)
+                q.enqueue(clone)
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -126,9 +150,13 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        travels = self.dft(starting_vertex, rType=list)
+        endpoint = travels.index(str(destination_vertex))
+        route = travels[:endpoint]
+        route.append(destination_vertex)
+        return list(map(int, route))
 
-    def dfs_recursive(self, starting_vertex, destination_vertex):
+    def dfs_recursive(self, starting_vertex, destination_vertex, travels=None):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -136,7 +164,13 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        if travels is None:
+            travels = self.dft(starting_vertex, rType=list)
+            self.dfs_recursive(starting_vertex, destination_vertex, travels)
+        endpoint = travels.index(str(destination_vertex))
+        route = travels[:endpoint]
+        route.append(destination_vertex)
+        return list(map(int, route))
 
 
 if __name__ == '__main__':

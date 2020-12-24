@@ -2,10 +2,13 @@
 Simple graph implementation
 """
 from util import Stack, Queue  # These may come in handy
+from collections import OrderedDict
+
 
 class Graph:
 
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
+
     def __init__(self):
         self.vertices = {}
 
@@ -13,42 +16,115 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        if vertex_id not in self.vertices:
+            self.vertices[vertex_id] = set()
+
+    def add_vertices(self, vertices):
+        for vertex_id in vertices:
+            if vertex_id not in self.vertices:
+                self.vertices[vertex_id] = set()
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        have_1 = v1 in self.vertices
+        have_2 = v2 in self.vertices
+        if (have_1 and have_2):
+            self.vertices[v1].add(v2)
+            return
+        no_2 = f"No '{str(v2)}' vertex in graph" if (
+            have_1 and not have_2) else False
+        no_1 = f"No '{str(v1)}' vertex in graph" if (
+            have_2 and not have_1) else False
+        no = f"No '{str(v1)}' or '{str(v2)}' vertex in graph" if (
+            not have_1 and not have_2) else False
+        err = no or no_1 or no_2
+        raise KeyError(err)
+
+    def add_edges(self, v1, edges):
+        for v2 in edges:
+            self.add_edge(v1, v2)
 
     def get_neighbors(self, vertex_id):
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        return self.vertices.get(vertex_id, None)
 
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue(starting_vertex)
+        visited = OrderedDict()  # boolean matrix
+        # loop...
+        while q.size() > 0:  # for every vert,
+            vertex_id = q.dequeue()  # obtained from g,
+            if not visited.get(vertex_id, False):  # if not already visited,
+                visited[vertex_id] = True  # mark as visited
+                adjacent = self.get_neighbors(
+                    vertex_id)  # find adjacent vertices
+                for neighbor in adjacent:  # for every adjacent vertice
+                    q.enqueue(neighbor)  # push onto stack
+        # finally,
+        #   cast the vistied vertices into
+        #    the format expected by tests.
+        print("\n".join(list(map(str, visited))))
 
-    def dft(self, starting_vertex):
+    def dft(self, starting_vertex, rType=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        # stack = [starting_vertex]  # create new stack containing the head of g
+        stack = Stack()
+        stack.push(starting_vertex)
+        visited = OrderedDict()  # boolean matrix
+        # loop...
+        while stack.size() > 0:  # for every vert,
+            vertex_id = stack.pop()  # obtained from g,
+            if not visited.get(vertex_id, False):  # if not already visited,
+                visited[vertex_id] = True  # mark as visited
+                adjacent = self.get_neighbors(
+                    vertex_id)  # find adjacent vertices
+                for neighbor in adjacent:  # for every adjacent vertice
+                    stack.push(neighbor)  # push onto stack
+        # finally,
+        #   cast the vistied vertices into
+        #    the format expected by tests.
+        if not rType:
+            print("\n".join(list(map(str, visited))))
+            return
+        return rType(map(str, visited))
 
-    def dft_recursive(self, starting_vertex):
+    def dft_recursive(self, starting_vertex, visited=None, rList=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
 
         This should be done using recursion.
         """
-        pass  # TODO
+        if visited is None:
+            visited = OrderedDict()
+        nbrs = self.get_neighbors(starting_vertex)
+        if len(visited) == 0:
+            visited[starting_vertex] = True
+            if rList is None:
+                print(starting_vertex)
+            else:
+                rList.append(starting_vertex)
+        for nbr in nbrs:
+            if not visited.get(nbr, False):
+                visited[nbr] = True
+                if rList is None:
+                    print(nbr)
+                else:
+                    rList.append(nbr)
+                self.dft_recursive(nbr, visited, rList)
+        return rList
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -56,7 +132,19 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue([starting_vertex])
+        # loop...
+        while q.size() > 0:
+            cur = q.dequeue()  # the current path
+            tail = cur[-1]  # visiting
+            if tail == destination_vertex:
+                return cur  # found destination, return path
+            nbrs = self.get_neighbors(tail)  # get adjacent vertices
+            for vertex_id in nbrs:
+                clone = list(cur)
+                clone.append(vertex_id)
+                q.enqueue(clone)
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -64,9 +152,13 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        travels = self.dft(starting_vertex, rType=list)
+        endpoint = travels.index(str(destination_vertex))
+        route = travels[:endpoint]
+        route.append(destination_vertex)
+        return list(map(int, route))
 
-    def dfs_recursive(self, starting_vertex, destination_vertex):
+    def dfs_recursive(self, starting_vertex, destination_vertex, travels=None):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -74,7 +166,14 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        if travels is None:
+            travels = self.dft(starting_vertex, rType=list)
+            self.dfs_recursive(starting_vertex, destination_vertex, travels)
+        endpoint = travels.index(str(destination_vertex))
+        route = travels[:endpoint]
+        route.append(destination_vertex)
+        return list(map(int, route))
+
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
